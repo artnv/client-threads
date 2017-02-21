@@ -76,7 +76,7 @@ var thr = ClientThreads({
 		if(thread.is.function(msg)) {
 			console.log( msg() );
 		} else {
-			console.log(e.data);  // e.data в отличии от msg всегда возвращяет "string"	
+			console.log(e.data);  // e.data в отличии от msg всегда возвращает "string"	
 			
 			if(msg == "close") {
 				thread.close(); // завершение работы внутри потока
