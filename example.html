@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>clientThreads</title>
+<script src="clientThreads-0.1.0.min.js"></script>
+<script>
+window.addEventListener("load", function() {
+var thr = ClientThreads({
+    x: 10, y: 25
+}, function(e) {
+
+    /* Доступ к аргументам в потоке */
+    var args = thread.arguments;
+    console.log("Аргументы: "+(args.x + args.y)); // 35
+
+    /* Получение сообщений */
+    thread.onMessage = function(msg, e) {
+
+        /* проверка типов данных */
+        if(thread.is.function(msg)) {
+            console.log( msg() );
+        } else {
+            console.log(e.data);  // e.data в отличии от msg всегда возвращает "string"   
+
+            if(msg == "close") {
+                thread.close(); // завершение работы внутри потока
+            }
+        }
+
+    };
+
+    /* Способы отправки сообщений в колбек */
+    thread.postMessage("<< Из потока. Первое сообщение");
+
+    thread.postMessage([1, 3, function() {
+        return "<< Из потока. Второе сообщение в виде функции которая в массиве";
+    }]);
+
+    /* return завершает работу и он так же, по завершению может отправить сообщение в колбек */
+    return "<< Из потока. Третье сообщение в колбек"; 
+}, function (msg, e) {
+
+    if(thr.is.array(msg)) {
+        console.log( msg[2]() ); 
+    }
+
+    if(thr.is.string(msg)) {
+        console.log(msg);
+    }
+
+    // console.log(msg);
+
+}); 
+
+
+thr.postMessage(">>>> В поток. Новое сообщение");
+thr.postMessage(function() {return ">>>> В поток. Результат выполнения функции: " + (200+300);});
+// thr.close(); 
+
+
+}, false);
+</script>
+</head>
+<body>
+see console
+</body>
+</html>
